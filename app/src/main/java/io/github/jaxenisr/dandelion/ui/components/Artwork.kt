@@ -1,56 +1,59 @@
 package io.github.jaxenisr.dandelion.ui.components
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
 import io.github.jaxenisr.dandelion.data.Game
-import io.github.jaxenisr.dandelion.ui.Type
 
-/** Placeholder cover: a gradient from the game palette plus the title. No artwork is copied. */
+/**
+ * Placeholder cover: a small landscape painted from the game palette. No artwork is copied and
+ * nothing is written on the cover; the name sits under it in the library.
+ */
 @Composable
 fun CoverArt(game: Game, modifier: Modifier = Modifier) {
-    val ink = if (game.skyBottom.luminance() > 0.55f) {
-        Color.Black.copy(alpha = 0.72f)
-    } else {
-        Color.White.copy(alpha = 0.95f)
-    }
-    Box(
-        modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(Brush.linearGradient(listOf(game.skyTop, game.skyBottom, game.horizon))),
-    ) {
-        Box(
-            Modifier
-                .matchParentSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            Color.White.copy(alpha = 0.20f),
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.14f),
-                        ),
-                    ),
-                ),
+    Canvas(modifier.clip(RoundedCornerShape(12.dp))) {
+        val w = size.width
+        val h = size.height
+
+        drawRect(Brush.verticalGradient(listOf(game.skyTop, game.skyBottom)))
+
+        // Sun glow, low and soft over the horizon.
+        val sun = Offset(w * 0.7f, h * 0.34f)
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(Color.White.copy(alpha = 0.55f), Color.Transparent),
+                center = sun,
+                radius = h * 0.34f,
+            ),
+            radius = h * 0.34f,
+            center = sun,
         )
-        Label(
-            text = game.title,
-            style = Type.CoverTitle,
-            color = ink,
-            modifier = Modifier.align(Alignment.BottomStart).padding(14.dp),
-            maxLines = 2,
-        )
+
+        val far = Path().apply {
+            moveTo(0f, h * 0.72f)
+            cubicTo(w * 0.2f, h * 0.5f, w * 0.4f, h * 0.62f, w * 0.58f, h * 0.7f)
+            cubicTo(w * 0.74f, h * 0.77f, w * 0.86f, h * 0.66f, w, h * 0.72f)
+            lineTo(w, h)
+            lineTo(0f, h)
+            close()
+        }
+        drawPath(far, game.horizon.copy(alpha = 0.45f))
+
+        val near = Path().apply {
+            moveTo(0f, h * 0.88f)
+            cubicTo(w * 0.24f, h * 0.66f, w * 0.6f, h * 0.96f, w, h * 0.78f)
+            lineTo(w, h)
+            lineTo(0f, h)
+            close()
+        }
+        drawPath(near, game.horizon.copy(alpha = 0.8f))
     }
 }
 
