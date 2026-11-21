@@ -42,21 +42,22 @@ private fun changeBetween(from: Destination, to: Destination): ScreenChange = wh
     else -> ScreenChange.Crossfade
 }
 
-/** iOS push: the new page comes in from the right, the old one gives way and dims. */
+/**
+ * iOS push: the new page slides over the old one, which gives way by a third. Both pages stay
+ * fully opaque; fading them over a white page only washes it out to grey.
+ */
 private fun pushIncoming(): EnterTransition =
-    slideInHorizontally(Motion.gentleOffset()) { width -> width } + fadeIn(Motion.Fade)
+    slideInHorizontally(Motion.gentleOffset()) { width -> width }
 
 private fun pushOutgoing(): ExitTransition =
-    slideOutHorizontally(Motion.gentleOffset()) { width -> -(width * 0.3f).toInt() } +
-        fadeOut(Motion.Fade, targetAlpha = 0.85f)
+    slideOutHorizontally(Motion.gentleOffset()) { width -> -(width * 0.3f).toInt() }
 
 /** Back: the same move reversed. */
 private fun popIncoming(): EnterTransition =
-    slideInHorizontally(Motion.gentleOffset()) { width -> -(width * 0.3f).toInt() } +
-        fadeIn(Motion.Fade, initialAlpha = 0.85f)
+    slideInHorizontally(Motion.gentleOffset()) { width -> -(width * 0.3f).toInt() }
 
 private fun popOutgoing(): ExitTransition =
-    slideOutHorizontally(Motion.gentleOffset()) { width -> width } + fadeOut(Motion.Fade)
+    slideOutHorizontally(Motion.gentleOffset()) { width -> width }
 
 @Composable
 fun DandelionApp(vm: DandelionViewModel = viewModel()) {

@@ -1,5 +1,9 @@
 package io.github.jaxenisr.dandelion.ui.screens
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,18 +15,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import io.github.jaxenisr.dandelion.DandelionViewModel
 import io.github.jaxenisr.dandelion.data.Game
 import io.github.jaxenisr.dandelion.ui.Ink
+import io.github.jaxenisr.dandelion.ui.Motion
 import io.github.jaxenisr.dandelion.ui.Type
 import io.github.jaxenisr.dandelion.ui.components.CoverArt
 import io.github.jaxenisr.dandelion.ui.components.IconKind
 import io.github.jaxenisr.dandelion.ui.components.Label
 import io.github.jaxenisr.dandelion.ui.components.RoundSymbolButton
 import io.github.jaxenisr.dandelion.ui.components.TitleMenuPage
-import io.github.jaxenisr.dandelion.ui.components.tapScale
 import io.github.jaxenisr.dandelion.ui.nav.MenuEntry
 
 @Composable
@@ -63,7 +70,21 @@ fun GamesScreen(vm: DandelionViewModel) {
 
 @Composable
 private fun GameCell(game: Game, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Column(modifier.tapScale(onClick = onClick, scale = 1.02f, alpha = 1f)) {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    // iOS dims the whole cell while the finger is down. Scaling it instead makes the name and
+    // the size jitter against their neighbours, so the cell only dims.
+    val dim by animateFloatAsState(
+        targetValue = if (pressed) 0.68f else 1f,
+        animationSpec = Motion.Snappy,
+        label = "cellPress",
+    )
+
+    Column(
+        modifier = modifier
+            .graphicsLayer { alpha = dim }
+            .clickable(interactionSource = interaction, indication = null, onClick = onClick),
+    ) {
         CoverArt(game, Modifier.fillMaxWidth().aspectRatio(163f / 202f))
         Spacer(Modifier.height(12.dp))
         Label(game.title, Type.GameName, maxLines = 1)
