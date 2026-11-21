@@ -47,6 +47,17 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Minimum Android version is 8.0 (API 26), target and compile SDK are 35.
 
+## Download
+
+Every push to `main` builds the debug APK in GitHub Actions and replaces the prerelease tagged
+`latest`, so this link always points at the newest build:
+
+```
+https://github.com/jaxenisr/dandelion/releases/download/latest/app-debug.apk
+```
+
+Open that on the phone to install it.
+
 ## Design
 
 The four screens follow the files in `design/`. Tokens are in `ui/Tokens.kt`: white background,
@@ -64,6 +75,10 @@ The title menu is a translucent white surface with a 0.5 dp border and a soft sh
 12 and newer the page behind it is drawn a second time and blurred with `Modifier.blur`, clipped
 to the menu shape; on older versions the translucency alone carries the effect.
 
+The animations live in `ui/Motion.kt`: two springs for controls and menus, one for screens, and a
+short fade for colour. Presses ease instead of snapping, the title menu has an exit as well as an
+entrance, and screens push or crossfade rather than swapping.
+
 ## What is missing
 
 - **The emulator core.** No core is bundled, no ROM is loaded and no frame is emulated. The
@@ -71,8 +86,8 @@ to the menu shape; on older versions the translucency alone carries the effect.
   panel is sample data and the controls do not drive anything.
 - **Game importing.** The `+` button is the place for it, but there is no file picker and no ROM
   scanning yet; the library is the four sample entries in `data/Game.kt`.
-- **Real covers.** Covers are gradients with the game title. A real library would load artwork
-  from the file system.
+- **Real covers.** Covers are painted gradients with a small landscape. A real library would load
+  artwork from the file system.
 - **Settings plumbing.** The settings are persisted, but a core would have to read them.
 
 To add a core, the natural seam is `DandelionViewModel.play()` and the `EmulationScreen`: replace
