@@ -22,7 +22,7 @@ import io.github.jaxenisr.dandelion.ui.components.IconKind
 import io.github.jaxenisr.dandelion.ui.components.Label
 import io.github.jaxenisr.dandelion.ui.components.RoundSymbolButton
 import io.github.jaxenisr.dandelion.ui.components.TitleMenuPage
-import io.github.jaxenisr.dandelion.ui.components.tapDim
+import io.github.jaxenisr.dandelion.ui.components.tapScale
 import io.github.jaxenisr.dandelion.ui.nav.MenuEntry
 
 @Composable
@@ -63,7 +63,7 @@ fun GamesScreen(vm: DandelionViewModel) {
 
 @Composable
 private fun GameCell(game: Game, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Column(modifier.tapDim(onClick)) {
+    Column(modifier.tapScale(onClick = onClick, scale = 1.02f, alpha = 1f)) {
         CoverArt(game, Modifier.fillMaxWidth().aspectRatio(163f / 202f))
         Spacer(Modifier.height(12.dp))
         Label(game.title, Type.GameName, maxLines = 1)
