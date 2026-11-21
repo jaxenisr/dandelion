@@ -37,8 +37,10 @@ jobs:
         with:
           name: dandelion-debug
           path: apk
-      - env:
+      - name: Replace the latest prerelease
+        env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           gh release view latest >/dev/null 2>&1 ||
             gh release create latest \
